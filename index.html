@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#10b981" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="减重计划" />
+  <title>小程减重计划</title>
+  <link rel="manifest" href="./assets/manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="./assets/icon.svg" />
+  <link rel="apple-touch-icon" href="./assets/icon.svg" />
+  <style>
+    :root { --green:#10b981; --green-d:#0f766e; --green-l:#d1fae5; --ink:#0f172a; --muted:#64748b; --bg:#f4f6f8; --card:#fff; --line:#e5e7eb; --red:#ef4444; --radius:16px; --shadow:0 8px 24px rgba(15,118,110,.08); }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--ink); line-height:1.55; padding-bottom:84px; -webkit-font-smoothing:antialiased; }
+    a { color:var(--green-d); }
+    .hero { background:linear-gradient(135deg,#34d399 0%,#0f766e 100%); color:#fff; padding:22px 18px 60px; border-radius:0 0 28px 28px; }
+    .hero h1 { margin:0 0 4px; font-size:22px; font-weight:700; }
+    .hero p { margin:0 0 14px; opacity:.92; font-size:14px; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.28); padding:8px 12px; border-radius:14px; font-size:13px; backdrop-filter:blur(4px); }
+    .chip b { font-size:15px; }
+    .wrap { padding:0 14px; }
+    .deck { margin-top:-34px; }
+    .card { background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; margin-bottom:14px; }
+    .card h2 { margin:0 0 4px; font-size:17px; }
+    .card .sub { color:var(--muted); font-size:13px; margin-bottom:12px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .stat { background:var(--green-l); border-radius:14px; padding:12px; }
+    .stat .k { font-size:12px; color:var(--green-d); }
+    .stat .v { font-size:20px; font-weight:700; color:var(--green-d); }
+    .stat .u { font-size:12px; color:var(--green-d); }
+    .rules { margin:0; padding-left:20px; }
+    .rules li { margin-bottom:8px; font-size:14px; }
+    .tabs { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--line); display:flex; padding-bottom:env(safe-area-inset-bottom); z-index:50; }
+    .tab { flex:1; text-align:center; padding:10px 0 8px; font-size:12px; color:var(--muted); border:none; background:none; cursor:pointer; }
+    .tab .ico { font-size:20px; display:block; line-height:1; margin-bottom:2px; }
+    .tab.active { color:var(--green-d); font-weight:700; }
+    .shell { display:none; }
+    .shell.on { display:block; }
+    .day { border:1px solid var(--line); border-radius:14px; margin-bottom:12px; overflow:hidden; }
+    .day > .dhead { background:var(--green-l); color:var(--green-d); font-weight:700; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
+    .meal { display:flex; gap:10px; padding:10px 12px; border-top:1px dashed var(--line); }
+    .meal .mt { width:52px; flex:none; font-size:13px; color:var(--green-d); font-weight:600; }
+    .meal .mt small { display:block; color:var(--muted); font-weight:400; }
+    .meal .food { flex:1; font-size:14px; }
+    .meal .kcal { flex:none; color:var(--muted); font-size:12px; white-space:nowrap; }
+    .check { display:flex; align-items:flex-start; gap:10px; padding:11px 0; border-bottom:1px solid var(--line); }
+    .check:last-of-type { border-bottom:none; }
+    .check input { width:24px; height:24px; flex:none; margin:2px 0 0; accent-color:var(--green); }
+    .check label { font-size:14px; }
+    .prog { height:10px; border-radius:999px; background:var(--line); overflow:hidden; margin:10px 0 4px; }
+    .prog > span { display:block; height:100%; background:var(--green); border-radius:999px; transition:width .3s; }
+    .row { display:flex; gap:8px; margin-top:12px; }
+    input[type=date],input[type=number],input[type=text] { border:1px solid var(--line); border-radius:12px; padding:11px 12px; font-size:15px; background:#fff; color:var(--ink); width:100%; }
+    .btn { border:none; border-radius:12px; padding:11px 16px; font-size:15px; font-weight:600; background:var(--green); color:#fff; cursor:pointer; }
+    .btn.ghost { background:var(--green-l); color:var(--green-d); }
+    .wrow { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
+    .wrow:last-child { border-bottom:none; }
+    .delta { font-size:13px; }
+    .delta.down { color:var(--green-d); }
+    .delta.up { color:var(--red); }
+    .note { background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:12px; padding:10px 12px; font-size:13px; margin-top:12px; }
+    .dis { background:#fef2f2; border:1px solid #fecaca; color:#991b1b; border-radius:12px; padding:12px; font-size:12px; margin-top:12px; line-height:1.6; }
+    .muted { color:var(--muted); font-size:13px; }
+    .switch-tip { font-size:14px; padding:8px 0; border-bottom:1px solid var(--line); }
+    .switch-tip b { color:var(--green-d); }
+    .empty { color:var(--muted); font-size:14px; text-align:center; padding:16px 0; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>🥗 小程减重计划</h1>
+    <p>科学减脂 · 第一周食谱 + 每日打卡 + 体重记录</p>
+    <div class="chips">
+      <div class="chip">BMI<br><b>33.0</b></div>
+      <div class="chip">每日摄入<br><b>2000–2200 大卡</b></div>
+      <div class="chip">目标体重<br><b>90 kg</b></div>
+      <div class="chip">预计<br><b>~9 个月</b></div>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="deck">
+      <section class="shell on" id="s-overview">
+        <div class="card">
+          <h2>📊 我的评估</h2>
+          <div class="sub">男 · 25 岁 · 181 cm · 108 kg（216 斤）</div>
+          <div class="grid2">
+            <div class="stat"><div class="k">BMI</div><div class="v">33.0</div><div class="u">肥胖一级</div></div>
+            <div class="stat"><div class="k">基础代谢 BMR</div><div class="v">2091</div><div class="u">大卡/天</div></div>
+            <div class="stat"><div class="k">每日总消耗 TDEE</div><div class="v">2510</div><div class="u">久坐 ×1.2</div></div>
+            <div class="stat"><div class="k">每日摄入目标</div><div class="v">2000–2200</div><div class="u">大卡/天</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>🎯 第一个月先做这三件</h2>
+          <ul class="rules">
+            <li><b>饮料清零：</b>可乐、奶茶、含糖饮料 → 无糖或白水。对脂肪肝和精力改善最直接。</li>
+            <li><b>每天快走 30–40 分钟 + 晚餐主食减半。</b></li>
+            <li><b>三餐规律、把早餐补上，</b>每周一早上空腹称重。</li>
+          </ul>
+          <div class="note">💡 你有脂肪肝，最有效的就是「减重 + 控糖 + 规律运动」。建议先去做一次肝功能（ALT/AST）、血糖、血脂检查拿个基线。</div>
+          <div class="note">📌 本应用为个人减脂参考，内容仅供参考、不构成医疗建议；个人数据仅保存在你的手机本地，不会上传。</div>
+        </div>
+        <div class="card">
+          <h2>🔄 爱吃的这样「换版本」</h2>
+          <div class="switch-tip"><b>蛋糕/甜点</b> → 水果 + 无糖酸奶，偶尔一小块黑巧克力</div>
+          <div class="switch-tip"><b>油炸 / 肯德基</b> → 空气炸锅/烤制去皮鸡腿、烤鱼、凉拌菜</div>
+          <div class="switch-tip"><b>可乐</b> → 无糖可乐过渡 → 苏打水/茶</div>
+          <div class="switch-tip"><b>白米白面</b> → 糙米、燕麦、杂粮</div>
+          <div class="switch-tip"><b>奶茶</b> → 无糖茶、柠檬水</div>
+        </div>
+      </section>
+      <section class="shell" id="s-meals">
+        <div class="card">
+          <h2>🍽️ 第一周食谱</h2>
+          <div class="sub">约 2000–2200 大卡/天 · 热量为估算，供参考</div>
+          <div id="meal-list"></div>
+          <div class="note">每顿「一拳头主食 + 一手掌蛋白质 + 大量蔬菜」。主食优先糙米/燕麦/杂粮。</div>
+        </div>
+      </section>
+      <section class="shell" id="s-checkin">
+        <div class="card">
+          <h2>✅ 每日打卡</h2>
+          <div class="sub">数据保存在你的手机上，不上传</div>
+          <input type="date" id="datepicker" />
+          <div class="prog"><span id="progfill" style="width:0"></span></div>
+          <div class="muted" id="progtext">达标 0 / 7 项</div>
+          <div id="checklist"></div>
+          <div class="row" style="margin-top:14px"><button class="btn" id="resetday">重置当天</button></div>
+          <div class="note" id="streak"></div>
+        </div>
+      </section>
+      <section class="shell" id="s-record">
+        <div class="card">
+          <h2>⚖️ 体重记录</h2>
+          <div class="sub">目标 90 kg（从 108 kg 出发）</div>
+          <div class="row">
+            <input type="number" id="weight" step="0.1" inputmode="decimal" placeholder="今天体重 kg" />
+            <button class="btn" id="addweight">记录</button>
+          </div>
+          <div class="muted" id="wstats" style="margin-top:12px"></div>
+          <div id="wchart"></div>
+          <div id="wlist"></div>
+          <div class="row" style="margin-top:14px"><button class="btn ghost" id="clearw">清空记录</button></div>
+        </div>
+      </section>
+      <div class="dis">⚠️ 重要声明：本应用中的所有内容（饮食建议、运动计划、体态评估等）仅供参考，不构成任何医疗或诊疗建议。患有心脏病、高血压、糖尿病等慢性疾病，孕期或哺乳期女性，术后恢复期患者，严重肥胖（BMI≥35）及有饮食障碍病史者请务必在专业人士指导下执行。减脂过程中如出现头晕、恶心、胸闷、心悸等不适，请立即停止并就医。本应用不对任何因自行执行方案导致的健康问题承担责任。</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="overview"><span class="ico">📊</span>概览</button>
+    <button class="tab" data-tab="meals"><span class="ico">🍽️</span>食谱</button>
+    <button class="tab" data-tab="checkin"><span class="ico">✅</span>打卡</button>
+    <button class="tab" data-tab="record"><span class="ico">⚖️</span>记录</button>
+  </nav>
+  <script>
+    const MEALS=[
+      {d:"周一",b:"燕麦牛奶粥（燕麦60g+牛奶250ml）+ 水煮蛋1个 + 苹果半个",bc:"≈550",l:"糙米饭180g + 清蒸鲈鱼180g + 蒜蓉西兰花250g",lc:"≈650",s:"凉拌鸡胸肉180g + 拍黄瓜 + 番茄蛋汤",sc:"≈550",sn:"无糖酸奶120g + 核桃10g",snc:"≈250",tot:"≈2000"},
+      {d:"周二",b:"全麦面包2片 + 煎蛋1个 + 番茄 + 无糖豆浆300ml",bc:"≈560",l:"荞麦面80g + 牛肉100g + 蔬菜沙拉",lc:"≈650",s:"三文鱼150g + 芦笋200g + 豆腐汤",sc:"≈560",sn:"蓝莓80g + 无糖酸奶",snc:"≈240",tot:"≈2010"},
+      {d:"周三",b:"红薯200g + 水煮蛋2个 + 无糖豆浆300ml",bc:"≈580",l:"糙米150g + 鸡胸肉150g + 凉拌木耳250g",lc:"≈660",s:"牛肉100g + 绿叶菜250g + 冬瓜汤",sc:"≈560",sn:"全麦面包1片 + 花生一小把",snc:"≈240",tot:"≈2040"},
+      {d:"周四",b:"燕麦40g + 蓝莓 + 无糖酸奶200g",bc:"≈540",l:"全麦卷饼 + 虾仁100g + 生菜番茄",lc:"≈660",s:"鸡蛋2个 + 菠菜200g + 番茄蛋汤",sc:"≈520",sn:"苹果1个 + 杏仁一小把",snc:"≈240",tot:"≈1960"},
+      {d:"周五",b:"荞麦面50g + 鸡胸肉50g + 黄瓜",bc:"≈560",l:"糙米150g + 清蒸鱼150g + 西兰花250g",lc:"≈660",s:"鸡胸肉150g + 凉拌黄瓜 + 紫菜汤",sc:"≈540",sn:"无糖酸奶 + 核桃",snc:"≈240",tot:"≈2000"},
+      {d:"周六",b:"全麦面包2片 + 鸡蛋1个 + 牛奶250ml",bc:"≈560",l:"红薯200g + 牛肉100g + 蔬菜",lc:"≈660",s:"三文鱼150g + 芦笋 + 豆腐汤",sc:"≈560",sn:"橙子1个 + 坚果",snc:"≈240",tot:"≈2020"},
+      {d:"周日",b:"燕麦 + 坚果 + 无糖豆浆",bc:"≈550",l:"荞麦面 + 虾仁 + 沙拉",lc:"≈650",s:"牛肉 + 番茄 + 白菜豆腐汤",sc:"≈550",sn:"水果一份",snc:"≈240",tot:"≈1990"}
+    ];
+    const CHECKS=[
+      {id:"nosugar",label:"今天没喝含糖饮料 / 奶茶"},
+      {id:"water",label:"喝水 ≥ 2L"},
+      {id:"bf",label:"吃了早餐"},
+      {id:"lunch",label:"午餐规律（蛋白 + 主食 + 蔬菜）"},
+      {id:"dinner",label:"晚餐清淡，主食减半"},
+      {id:"move",label:"运动 / 快走 ≥ 30 分钟"},
+      {id:"sleep",label:"睡眠 7 小时左右"}
+    ];
+    const CORE=["nosugar","water","move"];
+    const LS="jianfei_logs_v1";
+    let logs={};
+    try{logs=JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){logs={}}
+    const $=(s)=>document.querySelector(s);
+    const dkey=(d)=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    const today=()=>dkey(new Date());
+    const fmt=(d)=>{const x=new Date(d+"T00:00:00");const w=["日","一","二","三","四","五","六"][x.getDay()];return (x.getMonth()+1)+"月"+x.getDate()+"日 周"+w;};
+    function save(){localStorage.setItem(LS,JSON.stringify(logs));}
+    function entry(k){return logs[k]||{c:{},w:null};}
+    function renderMeals(){
+      $("#meal-list").innerHTML=MEALS.map(m=>`
+        <div class="day"><div class="dhead"><span>${m.d}</span><span>${m.tot} 大卡</span></div>
+        <div class="meal"><div class="mt">早餐<small>早上</small></div><div class="food">${m.b}</div><div class="kcal">${m.bc}</div></div>
+        <div class="meal"><div class="mt">午餐<small>中午</small></div><div class="food">${m.l}</div><div class="kcal">${m.lc}</div></div>
+        <div class="meal"><div class="mt">晚餐<small>晚上</small></div><div class="food">${m.s}</div><div class="kcal">${m.sc}</div></div>
+        <div class="meal"><div class="mt">加餐<small>下午</small></div><div class="food">${m.sn}</div><div class="kcal">${m.snc}</div></div></div>`).join("");
+    }
+    function renderChecks(){
+      const d=$("#datepicker").value||today();
+      const e=entry(d);
+      $("#checklist").innerHTML=CHECKS.map(c=>`<div class="check"><input type="checkbox" id="chk-${c.id}" ${e.c[c.id]?"checked":""}/><label for="chk-${c.id}">${c.label}</label></div>`).join("");
+      CHECKS.forEach(c=>{$("#chk-"+c.id).addEventListener("change",()=>{const k=$("#datepicker").value||today();logs[k]=logs[k]||{c:{},w:null};logs[k].c[c.id]=$("#chk-"+c.id).checked;save();updateProg();});});
+      updateProg();
+    }
+    function updateProg(){
+      const d=$("#datepicker").value||today();
+      const e=entry(d);
+      let n=0;CHECKS.forEach(c=>{if(e.c[c.id])n++;});
+      $("#progfill").style.width=(n/CHECKS.length*100)+"%";
+      $("#progtext").textContent="达标 "+n+" / "+CHECKS.length+" 项";
+      let streak=0,cur=new Date(d+"T00:00:00");
+      while(true){const key=dkey(cur);const en=entry(key);if(CORE.every(id=>en.c[id])){streak++;cur.setDate(cur.getDate()-1);}else{break;}}
+      $("#streak").textContent="🔥 连续核心达标 "+streak+" 天（无糖饮料 + 喝水 + 运动）";
+    }
+    function renderWeights(){
+      const list=Object.keys(logs).map(k=>({k,w:logs[k].w})).filter(x=>x.w).sort((a,b)=>a.k<b.k?-1:1);
+      if(list.length===0){$("#wlist").innerHTML='<div class="empty">还没有体重记录，点「记录」开始吧</div>';$("#wchart").innerHTML="";$("#wstats").textContent="";return;}
+      const first=list[0].w,last=list[list.length-1].w,diff=+(last-first).toFixed(1);
+      $("#wstats").innerHTML="起始 <b>"+first+"</b> kg → 当前 <b>"+last+"</b> kg · 共 <b>"+(diff>0?"+":"")+diff+"</b> kg";
+      const W=320,H=80,pad=10;
+      const min=Math.min(...list.map(x=>x.w)),max=Math.max(...list.map(x=>x.w));
+      const pts=list.map((x,i)=>{const px=pad+i*(W-2*pad)/Math.max(1,list.length-1);const py=H-pad-(max===min?0:(x.w-min)/(max-min)*(H-2*pad));return [px,py];});
+      const path=pts.map((p,i)=>(i===0?"M":"L")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+      $("#wchart").innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="90" preserveAspectRatio="none"><path d="'+path+'" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>'+pts.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="3" fill="#0f766e"/>').join("")+"</svg>";
+      $("#wlist").innerHTML=list.slice().reverse().slice(0,8).map(x=>{const idx=list.indexOf(x);const dd=idx>0?+(x.w-list[idx-1].w).toFixed(1):0;return '<div class="wrow"><span>'+fmt(x.k)+'</span><span><b>'+x.w+'</b> kg</span><span class="delta '+(dd<0?"down":dd>0?"up":"")+'">'+(dd===0?"—":(dd>0?"+":"")+dd)+'</span></div>';}).join("");
+    }
+    function bindTabs(){
+      document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));document.querySelectorAll(".shell").forEach(s=>s.classList.remove("on"));btn.classList.add("active");$("#s-"+btn.dataset.tab).classList.add("on");window.scrollTo(0,0);}));
+    }
+    function init(){
+      $("#datepicker").value=today();
+      $("#datepicker").addEventListener("change",()=>renderChecks());
+      $("#resetday").addEventListener("click",()=>{const d=$("#datepicker").value||today();delete logs[d];save();renderChecks();renderWeights();});
+      $("#addweight").addEventListener("click",()=>{const v=parseFloat($("#weight").value);if(!v||v<=0){alert("请输入体重");return;}const d=$("#datepicker").value||today();logs[d]=logs[d]||{c:{},w:null};logs[d].w=v;save();renderWeights();$("#weight").value="";updateProg();});
+      $("#clearw").addEventListener("click",()=>{Object.keys(logs).forEach(k=>{if(logs[k].w)logs[k].w=null;});save();renderWeights();});
+      renderMeals();renderChecks();renderWeights();bindTabs();
+      if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    }
+    init();
+  </script>
+</body>
+</html>

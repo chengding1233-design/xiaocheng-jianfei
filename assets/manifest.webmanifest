@@ -1,0 +1,20 @@
+{
+  "name": "小程减重计划",
+  "short_name": "减重计划",
+  "description": "科学减脂顾问 · 第一周食谱 + 每日打卡 + 体重记录",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#10b981",
+  "background_color": "#f4f6f8",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
