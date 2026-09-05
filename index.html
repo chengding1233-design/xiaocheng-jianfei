@@ -57,7 +57,8 @@
     .prog { height:10px; border-radius:999px; background:var(--line); overflow:hidden; margin:10px 0 4px; }
     .prog > span { display:block; height:100%; background:var(--green); border-radius:999px; transition:width .3s; }
     .row { display:flex; gap:8px; margin-top:12px; }
-    input[type=date],input[type=number],input[type=text] { border:1px solid var(--line); border-radius:12px; padding:11px 12px; font-size:15px; background:#fff; color:var(--ink); width:100%; }
+    input[type=date],input[type=number],input[type=text],textarea { border:1px solid var(--line); border-radius:12px; padding:11px 12px; font-size:15px; background:#fff; color:var(--ink); width:100%; }
+    textarea { resize:vertical; font-family:inherit; margin-top:8px; }
     .btn { border:none; border-radius:12px; padding:11px 16px; font-size:15px; font-weight:600; background:var(--green); color:#fff; cursor:pointer; }
     .btn.ghost { background:var(--green-l); color:var(--green-d); }
     .wrow { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); font-size:14px; }
@@ -132,6 +133,12 @@
           <div class="prog"><span id="progfill" style="width:0"></span></div>
           <div class="muted" id="progtext">达标 0 / 7 项</div>
           <div id="checklist"></div>
+          <div style="margin-top:16px">
+            <div class="sub" style="margin-bottom:8px">📝 今天的记录（体重 + 吃了什么）</div>
+            <input type="number" id="wcheck" step="0.1" inputmode="decimal" placeholder="今日体重 kg" />
+            <textarea id="food" rows="3" placeholder="今天吃了什么？例如：早餐 燕麦牛奶+蛋白，午餐 糙米饭+清蒸鱼，晚餐 鸡胸+西兰花"></textarea>
+            <div class="row"><button class="btn" id="savedaily">保存打卡</button><button class="btn ghost" id="exportcsv">📤 导出报表</button></div>
+          </div>
           <div class="row" style="margin-top:14px"><button class="btn" id="resetday">重置当天</button></div>
           <div class="note" id="streak"></div>
         </div>
@@ -187,7 +194,7 @@
     const today=()=>dkey(new Date());
     const fmt=(d)=>{const x=new Date(d+"T00:00:00");const w=["日","一","二","三","四","五","六"][x.getDay()];return (x.getMonth()+1)+"月"+x.getDate()+"日 周"+w;};
     function save(){localStorage.setItem(LS,JSON.stringify(logs));}
-    function entry(k){return logs[k]||{c:{},w:null};}
+    function entry(k){return logs[k]||{c:{},w:null,food:""};}
     function renderMeals(){
       $("#meal-list").innerHTML=MEALS.map(m=>`
         <div class="day"><div class="dhead"><span>${m.d}</span><span>${m.tot} 大卡</span></div>
@@ -213,6 +220,44 @@
       while(true){const key=dkey(cur);const en=entry(key);if(CORE.every(id=>en.c[id])){streak++;cur.setDate(cur.getDate()-1);}else{break;}}
       $("#streak").textContent="🔥 连续核心达标 "+streak+" 天（无糖饮料 + 喝水 + 运动）";
     }
+    function weekday(k){const x=new Date(k+"T00:00:00");return "日一二三四五六"[x.getDay()];}
+    function renderDaily(){
+      const d=$("#datepicker").value||today();const e=entry(d);
+      $("#wcheck").value=e.w!=null?e.w:"";
+      $("#food").value=e.food||"";
+    }
+    function saveDaily(){
+      const d=$("#datepicker").value||today();
+      logs[d]=logs[d]||{c:{},w:null,food:""};
+      const v=parseFloat($("#wcheck").value);
+      logs[d].w=v&&v>0?v:null;
+      logs[d].food=$("#food").value.trim();
+      save();renderDaily();renderWeights();updateProg();
+      const b=$("#savedaily");b.textContent="✓ 已保存";setTimeout(()=>{b.textContent="保存打卡";},1200);
+    }
+    function csvCell(s){s=String(s==null?"":s);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+    function exportCsv(){
+      const list=Object.keys(logs).filter(k=>logs[k].w!=null||(logs[k].food||"").trim()!=="").sort();
+      const weights=list.map(k=>logs[k].w).filter(x=>x!=null);
+      const rows=[];
+      rows.push("小程减肥计划 · 打卡报表");
+      rows.push("导出时间,"+new Date().toLocaleString());
+      rows.push("记录天数,"+list.length);
+      if(weights.length){
+        rows.push("起始体重,"+weights[0]+" kg");
+        rows.push("当前体重,"+weights[weights.length-1]+" kg");
+        rows.push("体重变化,"+(+(weights[weights.length-1]-weights[0]).toFixed(1))+" kg");
+        rows.push("平均体重,"+(weights.reduce((a,b)=>a+b,0)/weights.length).toFixed(1)+" kg");
+      }
+      rows.push("");
+      rows.push("日期,星期,体重(kg),今天吃了什么,达标项数");
+      list.forEach(k=>{const e=logs[k];const n=CHECKS.filter(c=>e.c&&e.c[c.id]).length;rows.push([k,weekday(k),e.w!=null?e.w:"",e.food||"",n].map(csvCell).join(","));});
+      const csv="\ufeff"+rows.join("\r\n");
+      const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");a.href=url;a.download="小程减重打卡报表_"+today()+".csv";
+      document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+    }
     function renderWeights(){
       const list=Object.keys(logs).map(k=>({k,w:logs[k].w})).filter(x=>x.w).sort((a,b)=>a.k<b.k?-1:1);
       if(list.length===0){$("#wlist").innerHTML='<div class="empty">还没有体重记录，点「记录」开始吧</div>';$("#wchart").innerHTML="";$("#wstats").textContent="";return;}
@@ -230,11 +275,13 @@
     }
     function init(){
       $("#datepicker").value=today();
-      $("#datepicker").addEventListener("change",()=>renderChecks());
-      $("#resetday").addEventListener("click",()=>{const d=$("#datepicker").value||today();delete logs[d];save();renderChecks();renderWeights();});
+      $("#datepicker").addEventListener("change",()=>{renderChecks();renderDaily();});
+      $("#resetday").addEventListener("click",()=>{const d=$("#datepicker").value||today();delete logs[d];save();renderChecks();renderWeights();renderDaily();});
+      $("#savedaily").addEventListener("click",saveDaily);
+      $("#exportcsv").addEventListener("click",exportCsv);
       $("#addweight").addEventListener("click",()=>{const v=parseFloat($("#weight").value);if(!v||v<=0){alert("请输入体重");return;}const d=$("#datepicker").value||today();logs[d]=logs[d]||{c:{},w:null};logs[d].w=v;save();renderWeights();$("#weight").value="";updateProg();});
       $("#clearw").addEventListener("click",()=>{Object.keys(logs).forEach(k=>{if(logs[k].w)logs[k].w=null;});save();renderWeights();});
-      renderMeals();renderChecks();renderWeights();bindTabs();
+      renderMeals();renderChecks();renderWeights();renderDaily();bindTabs();
       if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{});
     }
     init();
